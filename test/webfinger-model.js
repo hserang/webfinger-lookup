@@ -8,7 +8,7 @@ var sinonChai = require('sinon-chai');
 var webfingerSuccess = require('./fixtures/successes');
 var webfingerError = require('./fixtures/errors');
 
-var Model = require('../app/scripts/stores/host-meta-model');
+var Model = require('../app/scripts/stores/webfinger-model');
 
 var setUpSuccessfulModel = function() {
   var url = 'latambridgepay.com';
