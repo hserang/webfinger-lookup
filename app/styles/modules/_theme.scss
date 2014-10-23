@@ -1,0 +1,39 @@
+form {
+  background-color: $form-bg;
+  padding: 10px;
+}
+
+.container {
+  background-color: $white;
+}
+
+.navbar {
+  border-radius: 0;
+}
+
+.navbar-default {
+  background-color: $white;
+}
+
+.toggleable {
+  cursor: pointer;
+}
+
+//list
+dl {
+  padding-bottom: 15px;
+  border-bottom: 1px solid $gray-light;
+}
+
+//general indetation
+.indent-1 {
+  margin-left: 10px;
+}
+
+.indent-2 {
+  margin-left: 20px;
+}
+
+.indent-3 {
+  margin-left: 30px;
+}
