@@ -6,43 +6,44 @@ var Backbone = require('backbone');
 var Dispatcher = require('../dispatchers/dispatcher');
 Backbone.$ = $;
 
-var Greeting = Backbone.Model.extend({
+var WebfingerData = Backbone.Model.extend({
   defaults: {
+    resource: '',
     rawCode: {},
-    subject: '',
     expires: '',
-    properties: {},
-    links: []
+    aliases: [],
+    links: [],
+    subject: ''
   },
 
   requiredAttrs: {
-    subject: {
-      type: 'string',
-      minLength: 1
-    },
     expires: {
       type: 'string',
       minLength: 1
     },
-    properties: {
-      type: 'object',
+    aliases: {
+      type: 'array',
       minLength: 1
     },
     links: {
       type: 'array',
       minLength: 1
-    }
+    },
+    subject: {
+      type: 'string',
+      minLength: 1
+    },
   },
 
   initialize: function() {
-    _.bindAll(this, 'testValid', 'validate', 'updateUrl', 'dispatchCallback');
+    _.bindAll(this, 'testValid', 'validate', 'setResource', 'setUrl', 'setResourceUrl', 'updateResourceUrl', 'dispatchCallback');
 
     Dispatcher.register(this.dispatchCallback);
   },
 
   dispatchCallback: function(payload) {
     var handleAction = {
-      updateUrl: this.updateUrl
+      updateResourceUrl: this.updateResourceUrl
     };
 
     if (!_.isUndefined(handleAction[payload.actionType])) {
@@ -84,9 +85,9 @@ var Greeting = Backbone.Model.extend({
 
     // custom error messaging
     if (!isDefined) {
-      this.validationErrors.push('"' + attr + '" of host meta data is undefined');
+      this.validationErrors.push('"' + attr + '" of webfinger data is undefined');
     } else if (!isValid) {
-      this.validationErrors.push('"' + attr + '" of host meta data is invalid');
+      this.validationErrors.push('"' + attr + '" of webfinger data is invalid');
     }
 
     return isDefined && isValid;
@@ -107,14 +108,28 @@ var Greeting = Backbone.Model.extend({
     }
   },
 
-  setUrl: function(url) {
-    var filePath = '/.well-known/host-meta.json';
-
-    this.url = 'https://' + url + filePath;
+  setResource: function(resource) {
+    this.set('resource', resource);
   },
 
-  updateUrl: function(data) {
-    this.setUrl(data.hostUrl);
+  setUrl: function(url) {
+    var filePath = '/.well-known/webfinger';
+
+    this.url = 'https://' + url + filePath + '?resource=' + this.get('resource');
+  },
+
+  setResourceUrl: function(domain, resource) {
+    if (resource !== this.get('resource')) {
+      this.set('resource', resource);
+    }
+
+    if (domain !== this.get('domain')) {
+      this.setUrl(domain);
+    }
+  },
+
+  updateResourceUrl: function(data) {
+    this.setResourceUrl(data.domain, data.resource);
     this.fetch({reset:true});
   },
 
@@ -122,27 +137,29 @@ var Greeting = Backbone.Model.extend({
     // move stringify if we're not sanitizing here
     var output = {
           rawCode: JSON.stringify(data, undefined, 2),
+          expires: data.expires,
+          aliases: data.aliases,
           links: data.links,
           subject: data.subject,
-          aliases: data.aliases
+          properties: data.properties
         };
 
-    _.extend(output, this.parseProperties(data.properties));
+    // _.extend(output, this.parseProperties(data.properties));
 
     return output;
   },
 
-  parseProperties: function(properties) {
-    return {
-      description: properties.description,
-      name: properties.name,
-      domain: properties['rl:domain'],
-      hotWallets: properties['rl:hotwallets'],
-      type: properties['rl:type'],
-      accounts: properties['rl:accounts']
-    };
-  }
+  // parseProperties: function(properties) {
+  //   return {
+  //     description: properties.description,
+  //     name: properties.name,
+  //     domain: properties['rl:domain'],
+  //     hotWallets: properties['rl:hotwallets'],
+  //     type: properties['rl:type'],
+  //     accounts: properties['rl:accounts']
+  //   };
+  // }
 
 });
 
-module.exports = Greeting;
+module.exports = WebfingerData;
