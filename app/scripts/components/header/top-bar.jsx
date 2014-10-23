@@ -7,7 +7,7 @@ var MenuItem = require('react-bootstrap').MenuItem;
 
 //Sample config. TODO: pass it into props
 var config = {
-  brandName: "Host Meta Lookup",
+  brandName: "Webfinger Lookup",
   links: [
   ]
 };

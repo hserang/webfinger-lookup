@@ -7,29 +7,38 @@ var BootstrapInput = require('react-bootstrap').Input;
 var Codeblock = require('../codeblock/codeblock.jsx');
 var Dispatcher = require('../../dispatchers/dispatcher');
 
-var HostMeta = React.createClass({
+var Webfinger = React.createClass({
 
   defaults: {
-    hostUrl: "",
-    accounts: [],
+    domain: '',
+    resource: '',
     aliases: [],
     links: [],
-    hotWallets: [],
+    properties: {},
+    subject: '',
     code: {}
   },
 
   handleSubmit: function(e) {
     e.preventDefault();
 
-    var hostUrl = this.refs.host.getValue().trim();
+    var domain = this.refs.host.getValue().trim();
+    var resource = this.refs.resource.getValue().trim();
 
-    if (!hostUrl.length) {
+    if (!domain.length) {
+      return false;
+    }
+
+    if (!resource.length) {
       return false;
     }
 
     Dispatcher.dispatch({
-      actionType: 'updateUrl',
-      data: {hostUrl: hostUrl}
+      actionType: 'updateResourceUrl',
+      data: {
+        domain: domain,
+        resource: resource
+      }
     });
   },
 
@@ -55,20 +64,19 @@ var HostMeta = React.createClass({
     };
   },
 
-  updateHostMetaData: function() {
+  updateWebFingerData: function() {
     this.setState({
-      hostUrl: this.props.model.get('subject'),
-      accounts: this.props.model.get('accounts'),
       aliases: this.props.model.get('aliases'),
       links: this.props.model.get('links'),
-      hotWallets: this.props.model.get('hotWallets'),
+      properties: this.props.model.get('properties'),
+      subject: this.props.model.get('subject'),
       codeType: 'json',
       codeString: this.props.model.get('rawCode')
     });
   },
 
   componentDidMount: function() {
-    this.props.model.on('sync', this.updateHostMetaData);
+    this.props.model.on('sync', this.updateWebFingerData);
   },
 
   componentWillUnmount: function() {
@@ -76,42 +84,6 @@ var HostMeta = React.createClass({
   },
 
   //render helpers
-  getCurrencies: function(data) {
-    if (!data) {
-      return false;
-    }
-
-    var output = {};
-
-    output.currencyDt = <dt className="indent-2"> Currencies </dt>;
-
-    output.currencyDd =  _.map(data, function(val, key) {
-      return <dd key={_.uniqueId()} className="indent-3">{key}</dd>
-    });
-
-    return output;
-  },
-
-  getAccounts: function(data) {
-    if (_.isUndefined(data)) {
-      return false;
-    }
-
-    var output = {};
-    var _this = this;
-
-    output.accountDt = <dt> Accounts </dt>;
-    output.accountDd =  _.map(data, function(account, key) {
-
-      return ({
-       account: <dd key={_.uniqueId()} className="indent-1">{account.address}</dd>,
-       currency: _this.getCurrencies(account['rl:currencies'])
-      });
-    });
-
-    return <dl>{output}</dl>;
-  },
-
   getAliases: function(data) {
     if (_.isUndefined(data)) {
       return false;
@@ -134,7 +106,7 @@ var HostMeta = React.createClass({
 
     var output = {};
 
-    output.dt = <dt> Links </dt>;
+    output.dt = <dt>Links</dt>;
     output.dd =  _.map(data, function(link, key) {
       return <dd key={_.uniqueId()} className="indent-1">{link.rel}</dd>;
     });
@@ -142,17 +114,16 @@ var HostMeta = React.createClass({
     return <dl>{output}</dl>;
   },
 
-  getHotWallets: function(data) {
+
+  getSubject: function(data) {
     if (_.isUndefined(data)) {
       return false;
     }
 
     var output = {};
 
-    output.dt = <dt> Hot Wallets </dt>;
-    output.dd =  _.map(data, function(wallet, key) {
-      return <dd key={_.uniqueId()} className="indent-1">{wallet}</dd>;
-    });
+    output.dt = <dt>Subject</dt>;
+    output.dd = <dd className="indent-1">{data}</dd>
 
     return <dl>{output}</dl>;
   },
@@ -170,7 +141,7 @@ var HostMeta = React.createClass({
       <div>
         <div className="row">
           <form role="form" className="col-xs-12" onSubmit={this.handleSubmit}>
-            <h2 Host-Meta Check/>
+            <h2 Webfinger Check/>
             <BootstrapInput
               type = 'text'
               name = 'host'
@@ -179,18 +150,28 @@ var HostMeta = React.createClass({
               addonBefore = 'https://'
               ref = 'host'
               id = 'host'
-              value = {this.state.value}
+              value = {this.state.domain}
               label = 'Domain to Lookup'
+              required
             />
-            <BootstrapButton bsStyle="primary" type="submit">Get Host-Meta Data</BootstrapButton>
+            <BootstrapInput
+              type = 'text'
+              name = 'resource'
+              placeholder = 'Enter Account'
+              ref = 'resource'
+              id = 'resource'
+              value = {this.state.resource}
+              label = 'Account to Lookup at Domain'
+              required
+            />
+            <BootstrapButton bsStyle="primary" type="submit">Get Webfinger Data</BootstrapButton>
           </form>
         </div>
         <div className="row">
           <div className="col-xs-12 col-sm-8">
-              {this.getAccounts(this.state.accounts)}
-              {this.getAliases(this.state.aliases)}
-              {this.getLinks(this.state.links)}
-              {this.getHotWallets(this.state.hotWallets)}
+            {this.getAliases(this.state.aliases)}
+            {this.getLinks(this.state.links)}
+            {this.getSubject(this.state.subject)}
           </div>
         </div>
         <h5 onClick={this.toggleJSON} className="toggleable">raw JSON {this.state.toggleIcon}</h5>
@@ -202,4 +183,4 @@ var HostMeta = React.createClass({
   }
 });
 
-module.exports = HostMeta;
+module.exports = Webfinger;

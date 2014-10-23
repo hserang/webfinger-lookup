@@ -1,8 +1,8 @@
 var React = require('react');
 var TopBar = require('./header/top-bar.jsx');
-var HostMeta = require('./host-meta/host-meta.jsx');
+var Webfinger = require('./webfinger/webfinger.jsx');
 
-var model = new (require('./../stores/host-meta-model'))();
+var model = new (require('./../stores/webfinger-model'))();
 
 require('react-bootstrap');
 
@@ -14,7 +14,7 @@ var App =
       <div>
         <TopBar />
         <div className="container">
-          <HostMeta model={model} />
+          <Webfinger model={model} />
         </div>
       </div>
     )
