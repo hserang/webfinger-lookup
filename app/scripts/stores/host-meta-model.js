@@ -8,6 +8,7 @@ Backbone.$ = $;
 
 var Greeting = Backbone.Model.extend({
   defaults: {
+    resource: '',
     rawCode: {},
     subject: '',
     expires: '',
@@ -22,10 +23,6 @@ var Greeting = Backbone.Model.extend({
     },
     expires: {
       type: 'string',
-      minLength: 1
-    },
-    properties: {
-      type: 'object',
       minLength: 1
     },
     links: {
@@ -107,10 +104,14 @@ var Greeting = Backbone.Model.extend({
     }
   },
 
-  setUrl: function(url) {
-    var filePath = '/.well-known/host-meta.json';
+  setResource: function(resource) {
+    this.set('resource', resource);
+  },
 
-    this.url = 'https://' + url + filePath;
+  setUrl: function(url) {
+    var filePath = '/.well-known/webfinger';
+
+    this.url = 'https://' + url + filePath + '?resource=acct:' + this.get('resource');
   },
 
   updateUrl: function(data) {
