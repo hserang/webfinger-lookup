@@ -2,7 +2,7 @@ Webfinger Lookup
 ================
 (deployed url)
 
-## Usage:
+## Usage
 
 1. Enter domain where target account lies (example: staging.latambridgepay.com)
 2. Enter account to Webfinger (example: acct:conner@staging.latambridgepay.com)
@@ -10,15 +10,17 @@ Webfinger Lookup
 4. Toggle raw JSON data on and off by clicking "raw JSON"
 
 ## Example data
-**Domain: staging.latambridgepay.com**
+**Domain**
+staging.latambridgepay.com
 
-**Account: acct:conner@staging.latambridgepay.com**
+**Account**
+acct:conner@staging.latambridgepay.com
 
 ![Interface](http://imgur.com/Nnd7B4Y.png)
 
 ![Interface JSON](http://imgur.com/23pBTy5.png)
 
-## Development:
+## Development
 https://github.com/hserang/webfinger-lookup
 
 #### Install
